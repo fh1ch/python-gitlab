@@ -545,7 +545,7 @@ class SaveMixin(_RestObjectBase):
             return
 
         # call the manager
-        obj_id = self.get_id()
+        obj_id = self.encoded_id
         if TYPE_CHECKING:
             assert isinstance(self.manager, UpdateMixin)
         server_data = self.manager.update(obj_id, updated_data, **kwargs)
@@ -575,6 +575,8 @@ class ObjectDeleteMixin(_RestObjectBase):
         """
         if TYPE_CHECKING:
             assert isinstance(self.manager, DeleteMixin)
+        # NOTE: Don't use `self.encoded_id` here as `self.manager.delete()` will encode
+        # it.
         self.manager.delete(self.get_id(), **kwargs)
 
 
@@ -598,7 +600,7 @@ class UserAgentDetailMixin(_RestObjectBase):
             GitlabAuthenticationError: If authentication is not correct
             GitlabGetError: If the server cannot perform the request
         """
-        path = f"{self.manager.path}/{self.get_id()}/user_agent_detail"
+        path = f"{self.manager.path}/{self.encoded_id}/user_agent_detail"
         result = self.manager.gitlab.http_get(path, **kwargs)
         if TYPE_CHECKING:
             assert not isinstance(result, requests.Response)
@@ -705,7 +707,7 @@ class SubscribableMixin(_RestObjectBase):
             GitlabAuthenticationError: If authentication is not correct
             GitlabSubscribeError: If the subscription cannot be done
         """
-        path = f"{self.manager.path}/{self.get_id()}/subscribe"
+        path = f"{self.manager.path}/{self.encoded_id}/subscribe"
         server_data = self.manager.gitlab.http_post(path, **kwargs)
         if TYPE_CHECKING:
             assert not isinstance(server_data, requests.Response)
@@ -725,7 +727,7 @@ class SubscribableMixin(_RestObjectBase):
             GitlabAuthenticationError: If authentication is not correct
             GitlabUnsubscribeError: If the unsubscription cannot be done
         """
-        path = f"{self.manager.path}/{self.get_id()}/unsubscribe"
+        path = f"{self.manager.path}/{self.encoded_id}/unsubscribe"
         server_data = self.manager.gitlab.http_post(path, **kwargs)
         if TYPE_CHECKING:
             assert not isinstance(server_data, requests.Response)
@@ -752,7 +754,7 @@ class TodoMixin(_RestObjectBase):
             GitlabAuthenticationError: If authentication is not correct
             GitlabTodoError: If the todo cannot be set
         """
-        path = f"{self.manager.path}/{self.get_id()}/todo"
+        path = f"{self.manager.path}/{self.encoded_id}/todo"
         self.manager.gitlab.http_post(path, **kwargs)
 
 
@@ -781,7 +783,7 @@ class TimeTrackingMixin(_RestObjectBase):
         if "time_stats" in self.attributes:
             return self.attributes["time_stats"]
 
-        path = f"{self.manager.path}/{self.get_id()}/time_stats"
+        path = f"{self.manager.path}/{self.encoded_id}/time_stats"
         result = self.manager.gitlab.http_get(path, **kwargs)
         if TYPE_CHECKING:
             assert not isinstance(result, requests.Response)
@@ -800,7 +802,7 @@ class TimeTrackingMixin(_RestObjectBase):
             GitlabAuthenticationError: If authentication is not correct
             GitlabTimeTrackingError: If the time tracking update cannot be done
         """
-        path = f"{self.manager.path}/{self.get_id()}/time_estimate"
+        path = f"{self.manager.path}/{self.encoded_id}/time_estimate"
         data = {"duration": duration}
         result = self.manager.gitlab.http_post(path, post_data=data, **kwargs)
         if TYPE_CHECKING:
@@ -819,7 +821,7 @@ class TimeTrackingMixin(_RestObjectBase):
             GitlabAuthenticationError: If authentication is not correct
             GitlabTimeTrackingError: If the time tracking update cannot be done
         """
-        path = f"{self.manager.path}/{self.get_id()}/reset_time_estimate"
+        path = f"{self.manager.path}/{self.encoded_id}/reset_time_estimate"
         result = self.manager.gitlab.http_post(path, **kwargs)
         if TYPE_CHECKING:
             assert not isinstance(result, requests.Response)
@@ -838,7 +840,7 @@ class TimeTrackingMixin(_RestObjectBase):
             GitlabAuthenticationError: If authentication is not correct
             GitlabTimeTrackingError: If the time tracking update cannot be done
         """
-        path = f"{self.manager.path}/{self.get_id()}/add_spent_time"
+        path = f"{self.manager.path}/{self.encoded_id}/add_spent_time"
         data = {"duration": duration}
         result = self.manager.gitlab.http_post(path, post_data=data, **kwargs)
         if TYPE_CHECKING:
@@ -857,7 +859,7 @@ class TimeTrackingMixin(_RestObjectBase):
             GitlabAuthenticationError: If authentication is not correct
             GitlabTimeTrackingError: If the time tracking update cannot be done
         """
-        path = f"{self.manager.path}/{self.get_id()}/reset_spent_time"
+        path = f"{self.manager.path}/{self.encoded_id}/reset_spent_time"
         result = self.manager.gitlab.http_post(path, **kwargs)
         if TYPE_CHECKING:
             assert not isinstance(result, requests.Response)
@@ -893,7 +895,7 @@ class ParticipantsMixin(_RestObjectBase):
             The list of participants
         """
 
-        path = f"{self.manager.path}/{self.get_id()}/participants"
+        path = f"{self.manager.path}/{self.encoded_id}/participants"
         result = self.manager.gitlab.http_get(path, **kwargs)
         if TYPE_CHECKING:
             assert not isinstance(result, requests.Response)
